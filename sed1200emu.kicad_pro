@@ -45,7 +45,7 @@
         "silk_text_thickness": 0.09999999999999999,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.5
+          "min_clearance": 1e-06
         }
       },
       "diff_pair_dimensions": [],
@@ -469,7 +469,7 @@
   "sheets": [
     [
       "123507c6-0003-4611-af8b-4b1000037212",
-      "sed1200emu_0"
+      ""
     ]
   ],
   "text_variables": {}

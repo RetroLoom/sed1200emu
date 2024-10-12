@@ -1216,7 +1216,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:VCC") (at 180.34 93.98 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 080b8a96-9774-40d9-b20d-b43173365f73)
-    (property "Reference" "#P+3" (at 180.34 93.98 0)
+    (property "Reference" "#P+03" (at 180.34 93.98 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "VCC" (at 182.88 96.52 90)
@@ -1232,7 +1232,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#P+3") (unit 1)
+          (reference "#P+03") (unit 1)
         )
       )
     )
@@ -1241,7 +1241,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 185.42 66.04 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 08332ed9-eef8-46b1-b680-9f34b6e887b5)
-    (property "Reference" "#GND2" (at 185.42 66.04 0)
+    (property "Reference" "#GND02" (at 185.42 66.04 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 182.88 63.5 0)
@@ -1257,7 +1257,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND2") (unit 1)
+          (reference "#GND02") (unit 1)
         )
       )
     )
@@ -1291,7 +1291,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 198.12 91.44 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 12a46855-7325-4ecb-b7ab-073a259c87f8)
-    (property "Reference" "#GND3" (at 198.12 91.44 0)
+    (property "Reference" "#GND03" (at 198.12 91.44 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 195.58 88.9 0)
@@ -1307,7 +1307,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND3") (unit 1)
+          (reference "#GND03") (unit 1)
         )
       )
     )
@@ -1316,7 +1316,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:VCC") (at 165.1 127 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 14892c75-2290-47ff-bbc8-cf3cdf73138f)
-    (property "Reference" "#P+4" (at 165.1 127 0)
+    (property "Reference" "#P+04" (at 165.1 127 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "VCC" (at 167.64 129.54 90)
@@ -1332,7 +1332,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#P+4") (unit 1)
+          (reference "#P+04") (unit 1)
         )
       )
     )
@@ -1366,7 +1366,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 68.58 78.74 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1b922d43-0e4e-413f-8884-a20b38a8ba4d)
-    (property "Reference" "#GND9" (at 68.58 78.74 0)
+    (property "Reference" "#GND09" (at 68.58 78.74 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 66.04 76.2 0)
@@ -1382,7 +1382,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND9") (unit 1)
+          (reference "#GND09") (unit 1)
         )
       )
     )
@@ -1391,7 +1391,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 198.12 129.54 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1f4dc6da-f7ca-42e9-8533-dbb7970719da)
-    (property "Reference" "#GND10" (at 198.12 129.54 0)
+    (property "Reference" "#GND010" (at 198.12 129.54 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 195.58 127 0)
@@ -1407,7 +1407,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND10") (unit 1)
+          (reference "#GND010") (unit 1)
         )
       )
     )
@@ -1447,10 +1447,10 @@
     (property "Value" "MEGA8-AI" (at 106.68 57.15 0)
       (effects (font (size 1.778 1.5113)) (justify left bottom))
     )
-    (property "Footprint" "sed1200emu:TQFP32-08" (at 124.46 86.36 0)
+    (property "Footprint" "Package_QFP:TQFP-32_7x7mm_P0.8mm" (at 124.46 86.36 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Datasheet" "" (at 124.46 86.36 0)
+    (property "Datasheet" "http://ww1.microchip.com/downloads/en/DeviceDoc/atmel-2486-8-bit-avr-microcontroller-atmega8_l_datasheet.pdf" (at 124.46 86.36 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid c0327a09-e80e-49c1-8558-41315487566f))
@@ -1497,7 +1497,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 93.98 109.22 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 35b491f0-7147-49fb-928c-a9e2edb07fbc)
-    (property "Reference" "#GND4" (at 93.98 109.22 0)
+    (property "Reference" "#GND04" (at 93.98 109.22 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 91.44 111.76 0)
@@ -1513,7 +1513,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND4") (unit 1)
+          (reference "#GND04") (unit 1)
         )
       )
     )
@@ -1534,12 +1534,12 @@
     (property "Datasheet" "" (at 195.58 53.34 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid c6b7e9a3-a454-450b-ab5f-da7aae2eb4ef))
-    (pin "2" (uuid 16a07492-e667-436d-9b4a-e74c3fa8cfc0))
-    (pin "3" (uuid 5b83df5e-5af7-49f5-9715-bbb1b1e3bc11))
-    (pin "4" (uuid ade0ad4f-88fd-4453-9046-7059c885f955))
-    (pin "5" (uuid 7fe93022-e4db-4b02-8cd0-e309b5d94e27))
-    (pin "6" (uuid 341bb744-bc01-4311-8336-ae4594557eae))
+    (pin "1" (uuid a70d4a21-e3d4-4a84-88d0-119d88ec235e))
+    (pin "2" (uuid d0451b05-44c6-4f12-9104-9305db365180))
+    (pin "3" (uuid 438dea3f-01af-46c2-9bc7-2d10b2012ea5))
+    (pin "4" (uuid 9a04ad79-8b41-495c-992a-35415fe8d431))
+    (pin "5" (uuid 57bdb4a8-5533-4135-892c-2025409ba3cc))
+    (pin "6" (uuid 025cfbb0-ae0f-415f-9574-7bd1c7c4e329))
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
@@ -1552,7 +1552,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:VCC") (at 81.28 48.26 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 481500f7-34f5-4c64-b488-843393aff5aa)
-    (property "Reference" "#P+6" (at 81.28 48.26 0)
+    (property "Reference" "#P+06" (at 81.28 48.26 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "VCC" (at 78.74 50.8 90)
@@ -1568,7 +1568,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#P+6") (unit 1)
+          (reference "#P+06") (unit 1)
         )
       )
     )
@@ -1577,7 +1577,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:VCC") (at 86.36 71.12 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4a97a94a-1a99-47c1-bcc9-cbf73d956830)
-    (property "Reference" "#P+2" (at 86.36 71.12 0)
+    (property "Reference" "#P+02" (at 86.36 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "VCC" (at 88.9 73.66 90)
@@ -1593,7 +1593,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#P+2") (unit 1)
+          (reference "#P+02") (unit 1)
         )
       )
     )
@@ -1679,7 +1679,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:VCC") (at 187.96 142.24 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 647357c7-9c76-48a4-9111-e5be79b0b25e)
-    (property "Reference" "#P+5" (at 187.96 142.24 0)
+    (property "Reference" "#P+05" (at 187.96 142.24 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "VCC" (at 185.42 139.7 90)
@@ -1695,7 +1695,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#P+5") (unit 1)
+          (reference "#P+05") (unit 1)
         )
       )
     )
@@ -1704,7 +1704,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 99.06 109.22 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 85a4c46a-8247-48da-94d6-ee1d0d642a97)
-    (property "Reference" "#GND1" (at 99.06 109.22 0)
+    (property "Reference" "#GND01" (at 99.06 109.22 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 96.52 111.76 0)
@@ -1720,7 +1720,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND1") (unit 1)
+          (reference "#GND01") (unit 1)
         )
       )
     )
@@ -1820,7 +1820,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:VCC") (at 182.88 45.72 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 96a208ec-aeda-4e40-9004-26bb33eb5a40)
-    (property "Reference" "#P+1" (at 182.88 45.72 0)
+    (property "Reference" "#P+01" (at 182.88 45.72 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "VCC" (at 185.42 48.26 90)
@@ -1836,7 +1836,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#P+1") (unit 1)
+          (reference "#P+01") (unit 1)
         )
       )
     )
@@ -1845,7 +1845,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 88.9 109.22 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a3178849-ad48-40f0-8f97-7b4eb2e92ade)
-    (property "Reference" "#GND5" (at 88.9 109.22 0)
+    (property "Reference" "#GND05" (at 88.9 109.22 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 86.36 111.76 0)
@@ -1861,7 +1861,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND5") (unit 1)
+          (reference "#GND05") (unit 1)
         )
       )
     )
@@ -1896,7 +1896,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 182.88 160.02 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid abe26f2f-1ecd-49c9-9ac4-05d87e093aba)
-    (property "Reference" "#GND7" (at 182.88 160.02 0)
+    (property "Reference" "#GND07" (at 182.88 160.02 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 180.34 162.56 0)
@@ -1912,7 +1912,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND7") (unit 1)
+          (reference "#GND07") (unit 1)
         )
       )
     )
@@ -1946,7 +1946,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 68.58 83.82 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b41781ca-dd34-46a5-abc8-d0f9afc4683d)
-    (property "Reference" "#GND8" (at 68.58 83.82 0)
+    (property "Reference" "#GND08" (at 68.58 83.82 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 66.04 81.28 0)
@@ -1962,7 +1962,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND8") (unit 1)
+          (reference "#GND08") (unit 1)
         )
       )
     )
@@ -1983,12 +1983,12 @@
     (property "Datasheet" "" (at 195.58 73.66 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 1613a50f-9dcc-4de0-84cb-8044639c1191))
-    (pin "2" (uuid 3ac4fd1e-94d8-4776-a8aa-a8482bf26e44))
-    (pin "3" (uuid 95ed2573-f873-43ba-8cc2-0cddbf767790))
-    (pin "4" (uuid 2c7373e0-a241-4ef1-9198-3a575ac9864a))
-    (pin "5" (uuid 43b2f163-8cf1-4f52-a135-529ef7dcd6f7))
-    (pin "6" (uuid e1977108-a37d-483d-8fe3-a64285fa5a13))
+    (pin "1" (uuid 7b0032c5-c22d-4207-8ffc-f16487d1a5b8))
+    (pin "2" (uuid 4eda7297-3400-4014-ace1-22623097eae5))
+    (pin "3" (uuid a7bbaa24-4c0f-4806-8dfd-6f206ae28dd1))
+    (pin "4" (uuid f9a467e2-f8e1-4883-8d43-d7b9e713cce8))
+    (pin "5" (uuid 8db18f6e-85ca-4607-9432-5db492727341))
+    (pin "6" (uuid 02ae7095-1b09-4e43-94f2-d49330ba2d7d))
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
@@ -2027,7 +2027,7 @@
   (symbol (lib_id "sed1200emu-eagle-import:GND") (at 198.12 101.6 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d632d467-0523-49c9-8445-4ede4fc7dc9f)
-    (property "Reference" "#GND6" (at 198.12 101.6 0)
+    (property "Reference" "#GND06" (at 198.12 101.6 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 195.58 99.06 0)
@@ -2043,7 +2043,7 @@
     (instances
       (project "sed1200emu"
         (path "/123507c6-0003-4611-af8b-4b1000037212"
-          (reference "#GND6") (unit 1)
+          (reference "#GND06") (unit 1)
         )
       )
     )
