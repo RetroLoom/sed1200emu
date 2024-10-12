@@ -461,7 +461,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "specctra_dsn": "",
+      "specctra_dsn": "sed1200emu.dsn",
       "step": "",
       "vrml": ""
     },
