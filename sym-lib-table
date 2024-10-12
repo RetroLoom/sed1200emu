@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 0)
+  (lib (name "sed1200emu-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/sed1200emu-eagle-import.kicad_sym")(options "")(descr ""))
+)

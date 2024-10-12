@@ -1,0 +1,50 @@
+11933399201880
+sed1200emu
+1X06
+<b>PIN HEADER</b>
+
+0
+6
+6
+sed1200emu
+2,15_1,0
+<b>THROUGH-HOLE PAD</b>
+
+0
+1
+1
+sed1200emu
+C0805
+<b>CAPACITOR</b><p>
+
+0
+2
+2
+sed1200emu
+HC49_S
+<b>CRYSTAL</b>
+
+0
+2
+2
+sed1200emu
+M0805
+<b>RESISTOR</b><p>{return}MELF 0.10 W
+
+0
+2
+2
+sed1200emu
+TQFP32-08
+<B>Thin Plasic Quad Flat Package</B> Grid 0.8 mm
+
+0
+32
+32
+sed1200emu
+TUXGR_20X2
+<b>Tuxgraphics LCD display 20x2 characters</b> reflective, without background light<p>{return}Source: tuxgr_20x2.pdf
+
+0
+16
+16

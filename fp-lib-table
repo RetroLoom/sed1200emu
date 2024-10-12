@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "sed1200emu")(type "KiCad")(uri "$(KIPRJMOD)/sed1200emu.pretty")(options "")(descr ""))
+)
