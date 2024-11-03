@@ -67,10 +67,10 @@ int main () {
 	// INT0 (CS) ---\___/---	
 	// INT1 (E)      ___/---
 
-	EICRA = _BV(ISC11) | _BV(ISC10) |		// 11 - INT1 rising edge
+	MCUCR = _BV(ISC11) | _BV(ISC10) |		// 11 - INT1 rising edge
 			_BV(ISC01);						// 10 - INT0 falling edge
 
-	EIMSK = _BV(INT1) | _BV(INT0);			// enable INT1 and INT0
+	GICR = _BV(INT1) | _BV(INT0);			// enable INT1 and INT0
 
 
 

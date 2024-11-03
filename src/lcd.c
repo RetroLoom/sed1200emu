@@ -16,6 +16,14 @@ volatile uint8_t queueHead, queueTail;
 uint8_t queue [QUEUELEN];
 
 
+// Timer0 Configuration for Compare Match mode
+#define OCR0    _SFR_IO8(0x3C)  // Compare Match register
+#define TCCR0   _SFR_IO8(0x33)  // Timer/Counter Control register
+#define TIMSK   _SFR_IO8(0x39)  // Timer Interrupt Mask register
+#define WGM01   3               // Bit 3 in TCCR0 for CTC mode
+#define OCIE0   1               // Bit 1 in TIMSK to enable compare match interrupt
+
+
 /*
 
 	E	RS  	D7  D6  D5  D4
@@ -90,13 +98,13 @@ void LCD_Init () {
 
 
 
-	PORTB = 0b0010;			// выбор 4-битного режима
+	PORTB = 0b0010;			// пїЅпїЅпїЅпїЅпїЅ 4-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	_E ();
 	_delay_ms (2);
 
 
 
-	PORTB = 0b0010;			// подтверждение 4-битного режима
+	PORTB = 0b0010;			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	_E ();
 	_delay_ms (2);
 
@@ -106,7 +114,7 @@ void LCD_Init () {
 
 
 
-	PORTB = 0b0000;			// дисплей OFF
+	PORTB = 0b0000;			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ OFF
 	_E ();
 	_delay_ms (2);
 
@@ -115,7 +123,7 @@ void LCD_Init () {
 	_delay_ms (2);
 
 
-	PORTB = 0b0000;			// дисплей ON
+	PORTB = 0b0000;			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ON
 	_E ();
 	_delay_ms (2);
 
@@ -123,7 +131,10 @@ void LCD_Init () {
 	_E ();
 	_delay_ms (2);
 
-
+	// Timer0 Configuration for Compare Match mode
+    OCR0 = 5;  // Set the compare match value (adjust as needed)
+    TCCR0 = (1 << WGM01) | (1 << CS02) | (1 << CS00);  // CTC mode, prescaler clk/1024
+    TIMSK |= (1 << OCIE0);  // Enable Timer0 compare match interrupt
 
 }
 
@@ -175,7 +186,7 @@ void LCD_SendCmd (unsigned char c) {
  * ISR TIMER0_COMPA_vect
  *
  ***************************************************/
-ISR(TIMER0_COMPA_vect) {
+ISR(TIMER0_COMP_vect) {
 
 
         sei ();		

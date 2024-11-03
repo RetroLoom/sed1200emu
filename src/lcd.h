@@ -13,3 +13,7 @@ void LCD_SendCmd (uint8_t c);
 void LCD_SendChar (uint8_t c);
 
 extern volatile uint8_t LCDCol;
+
+uint8_t LCD_Dequeue();
+void LCD_Enqueue(uint8_t c);
+
