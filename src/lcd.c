@@ -189,7 +189,7 @@ void LCD_SendCmd (unsigned char c) {
 ISR(TIMER0_COMP_vect) {
 
 
-        sei ();		
+        //sei ();	
         
 		lcdIdx ++;
 		

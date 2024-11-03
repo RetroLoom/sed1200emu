@@ -72,18 +72,14 @@ int main () {
 
 	GICR = _BV(INT1) | _BV(INT0);			// enable INT1 and INT0
 
-
+	LCD_Init ();
 
 	sei ();
 
-
-	LCD_Init ();
-
 	LCD_SendCmd (CLR_DISP);
-
 	LCD_SendCmd (CUR_HOME);
 
-
+/*
 	// program CGRAM symbol 00
 	LCD_SendCmd (0x40);
 	LCD_SendChar (0x04);
@@ -94,7 +90,7 @@ int main () {
 	LCD_SendChar (0x04);
 	LCD_SendChar (0x04);
 	LCD_SendChar (0x00);
-
+*/
 
 
 //	LCD_SendChar ('7');
