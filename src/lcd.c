@@ -2,6 +2,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
+#include <string.h>
 
 #include "lcd.h"
 
@@ -74,68 +75,69 @@ uint8_t c;
 
 }
 
-
 /***************************************************
  *
  * LCD_Init
  *
  ***************************************************/
-void LCD_Init () {	
+void LCD_Init() {	
+    // Initial delay for LCD power-up
+    _delay_ms(50);
 
-	_delay_ms (50);
+	  // Send the command 0x03 three times to initialize the LCD
+    PORTB = 0x03;  // First command to set 8-bit mode
+    _E();          
+    _delay_ms(5);  
+
+    PORTB = 0x03;  // Second command
+    _E();          
+    _delay_ms(5);  
+
+    PORTB = 0x03;  // Third command
+    _E();          
+    _delay_ms(2);  
 	
-	PORTB = 0b0011;
-	_E ();
-	_delay_ms (5);
+    PORTB = 0x02;  // Send 0x02 to set to 4-bit mode
+    _E();          
+    _delay_ms(2);  
 
-	PORTB = 0b0011;
-	_E ();
-	_delay_ms (5);
+    PORTB = 0x02;  // Re-send 0x02 to ensure 4-bit mode is set
+    _E();          
+    _delay_ms(2);  
 
-	PORTB = 0b0011;
-	_E ();
-	_delay_ms (2);
+    PORTB = 0x08;  // configures the display for 1 line with a 5x8 font
+    _E();          
+    _delay_ms(2);  
 
+    PORTB = 0x00;  // Prepare to turn display off
+    _E();          
+    _delay_ms(2);  
 
+    PORTB = 0x08;  // Turn Off the display
+    _E();          
+    _delay_ms(2);  
 
-	PORTB = 0b0010;			// ����� 4-������� ������
-	_E ();
-	_delay_ms (2);
+	PORTB = 0x00;  // Prepare to clear display
+    _E();          
+    _delay_ms(2);  
 
+	PORTB = 0x01;  // Clear display
+    _E();          
+    _delay_ms(2);  
 
+	PORTB = 0x00;  // Prepare for entry mode set
+    _E();          
+    _delay_ms(2);  
 
-	PORTB = 0b0010;			// ������������� 4-������� ������
-	_E ();
-	_delay_ms (2);
+    // Set display control: Display ON, Cursor OFF, Blink OFF
+    PORTB = 0x0C;  // Send 0x0C for display control (Display ON)
+    _E();          
+    _delay_ms(2);  
 
-	PORTB = 0b1000;			
-	_E ();
-	_delay_ms (2);
-
-
-
-	PORTB = 0b0000;			// ������� OFF
-	_E ();
-	_delay_ms (2);
-
-	PORTB = 0b1000;
-	_E ();
-	_delay_ms (2);
-
-
-	PORTB = 0b0000;			// ������� ON
-	_E ();
-	_delay_ms (2);
-
-	PORTB = 0b1100;			// 1 D C B
-	_E ();
-	_delay_ms (2);
-
-	// Timer0 Configuration for Compare Match mode
+    // Timer0 Configuration for Compare Match mode
     OCR0 = 5;  // Set the compare match value (adjust as needed)
     TCCR0 = (1 << WGM01) | (1 << CS02) | (1 << CS00);  // CTC mode, prescaler clk/1024
     TIMSK |= (1 << OCIE0);  // Enable Timer0 compare match interrupt
-
 }
 
 
@@ -145,20 +147,20 @@ void LCD_SendChar (uint8_t c) {
 
 		_delay_us (100);
 
-        PORTB = ((c >> 4) & 0b00001111);
+        PORTB = ((c >> 4) & 0xF);
 		PORTD |= _BV(RS);                                              //set LCD to data mode
 
         _E();
 
 
-        PORTB = (c & 0b00001111);
+        PORTB = (c & 0xF);
 
         _E();
 }
 
 
 //--------Send command to LCD-----------------------------
-void LCD_SendCmd (unsigned char c) {
+void LCD_SendCmd (uint8_t c) {
 
         //_delay_ms (LCD_CHAR_SPEED);                      //Delay for LCD char
 		_delay_us (100);
@@ -166,7 +168,7 @@ void LCD_SendCmd (unsigned char c) {
 //      data = 0b00001111 | c;                                  //get upper nibble
 //      PORTC = (PORTC | 0b11110000) & data;        //set D4-D7
 
-        PORTB = (c >> 4) & 0b00001111;
+        PORTB = (c >> 4) & 0xF;
 
         PORTD &= ~_BV(RS);                                              //set LCD to command mode
         _E();
@@ -174,7 +176,7 @@ void LCD_SendCmd (unsigned char c) {
 //      data = c << 4;                                                  //get down nibble
 //      PORTC = (PORTC & 0b00001111) | data;        //set D4-D7 (only PORTC4-PORTC7)
 
-        PORTB = c & 0b00001111;
+        PORTB = c & 0xF;
 
         PORTD &= ~_BV(RS);                                                      //set LCD to command mode
         _E();
@@ -207,6 +209,23 @@ ISR(TIMER0_COMP_vect) {
 
 }
 
+/***************************************************
+ *
+ * LCD_GotoXY
+ *
+ ***************************************************/
+void LCD_GotoXY (uint8_t row, uint8_t col) {
+	uint8_t address = 0x00;
+    if (row == 0) {
+        address = 0x00 + col;  // First row
+    } else if (row == 1) {
+        address = 0x40 + col;  // Second row
+    }
+    LCD_SendCmd(LCD_SET_CURSOR | address);
+
+	LCDRow = row;
+	LCDCol = col;
+}
 
 /***************************************************
  *
@@ -214,20 +233,9 @@ ISR(TIMER0_COMP_vect) {
  *
  ***************************************************/
 void LCD_Home () {
-	//LCD_SendCmd (CUR_HOME);
+	LCD_GotoXY (0,0);
 	LCDCol = LCDRow = 0;
 };
-
-/***************************************************
- *
- * LCD_GotoXY
- *
- ***************************************************/
-void LCD_GotoXY (uint8_t col, uint8_t row) {
-	LCDCol = col;
-	LCDRow = row;
-}
-
 
 /***************************************************
  *
@@ -299,3 +307,39 @@ uint8_t b, i = 0;
 	i++;
 	}
 }
+
+void LCD_SendStr(const char *text)
+{
+	uint8_t i = 0;
+	while (i < 20)
+	{
+		LCD_SendChar(text[i]);
+		i++;
+	}
+}
+
+void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t length) {
+    
+	if (strlen(text) <= length) {
+        LCD_GotoXY(row, 0);
+        LCD_SendStr(text);
+    } else {
+		uint8_t offset = 0;
+
+        while (offset <= strlen(text) - length) {
+            LCD_GotoXY(row, 0);  // Move cursor to the start of the row
+
+            // Display 20 characters from the current offset
+			uint8_t i = 0;
+            while (i < 20) {
+                LCD_SendChar(text[offset + i]);
+				i++;
+            }
+
+            // Delay to control scrolling speed
+            _delay_ms(delay_ms);
+			offset++;
+        }
+    }
+}
+

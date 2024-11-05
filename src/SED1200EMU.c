@@ -4,18 +4,12 @@
 
 #include "lcd.h"
 
-
 volatile uint8_t sed_byte;
 volatile uint8_t rs;
 volatile uint8_t count_e;
-volatile uint8_t gotData = 0;
 
 extern volatile uint8_t queueHead, queueTail;
 
-
-//
-// 
-//
 uint8_t xlat [16] = {
 	0b0000, 0b1000, 0b0010, 0b1010,
 	0b0100, 0b1100, 0b0110, 0b1110,
@@ -34,7 +28,7 @@ int main () {
 	// PB1		(LCD) D5		o
 	// PB0		(LCD) D4		o
 
-	DDRB =	0b00001111;
+	DDRB =	0xF;
 
 	// PORT C
 	// ---------------------------
@@ -53,19 +47,7 @@ int main () {
 	// PD3		(SED1200) E 	i aka INT1
 	// PD2		(SED1200) CS 	i aka INT0
 
-	DDRD = 0b11000000;
-
-//	// Timer 0
-//	// -------
-//	TCCR0A = 2;
-//	TCCR0B = 5;		// prescaler 101, clk/1024
-//	OCR0A = 5;
-
-//	TIMSK0 = _BV(OCIE0A);
-
-
-	// INT0 (CS) ---\___/---	
-	// INT1 (E)      ___/---
+	DDRD = 0xC0;
 
 	MCUCR = _BV(ISC11) | _BV(ISC10) |		// 11 - INT1 rising edge
 			_BV(ISC01);						// 10 - INT0 falling edge
@@ -73,55 +55,21 @@ int main () {
 	GICR = _BV(INT1) | _BV(INT0);			// enable INT1 and INT0
 
 	LCD_Init ();
-
 	sei ();
-
-	LCD_SendCmd (CLR_DISP);
-	LCD_SendCmd (CUR_HOME);
-
-/*
-	// program CGRAM symbol 00
-	LCD_SendCmd (0x40);
-	LCD_SendChar (0x04);
-	LCD_SendChar (0x04);
-	LCD_SendChar (0x04);
-	LCD_SendChar (0x00);
-	LCD_SendChar (0x04);
-	LCD_SendChar (0x04);
-	LCD_SendChar (0x04);
-	LCD_SendChar (0x00);
-*/
-
-
-//	LCD_SendChar ('7');
-//	LCD_SendChar ('7');
-
-
-//	_delay_ms (500);
-
-//	LCD_SendCmd (CLR_DISP);
-//	LCD_SendCmd (CUR_HOME);
-
-
-//	if (gotData)
-//		LCD_SendChar (sed_byte);
 	
+	// Display initial message after initialization
+	//LCD_ScrollStr(" ** Roland MT-32 ** ", 0, 300, 20);  // 300ms delay for scrolling speed
+	LCD_Home ();
+	LCD_SendStr(" ** Roland MT-32 ** "); 
+    _delay_ms(2000);
 
-//	LCD_Home ();
-
+	// program CGRAM symbol 00
+    LCD_SendCmd(0x40);
+    LCD_SendChar(0x04); LCD_SendChar(0x04); LCD_SendChar(0x04);
+    LCD_SendChar(0x00); LCD_SendChar(0x04); LCD_SendChar(0x04);
+    LCD_SendChar(0x04); LCD_SendChar(0x00);
 
 	while (1) {
-
-/*
-		if (gotData) {
-			gotData = 0;
-		
-			if (rs) {			
-				LCD_Enqueue (sed_byte);
-			}	
-		}
-*/
-
  		if (queueHead != queueTail) {
 			uint8_t c = LCD_Dequeue ();
 			
@@ -135,40 +83,13 @@ int main () {
 				if (c == 0x01)
 					c = 0xff;
 
-
 				LCD_SendChar ((c == 0x7c) ? 0x00: c);	// instead '|' (0x7c) send CGRAM char 0
 			}
-
 
 			if ((c & 0x0e) == 0x0e) {	// sed1200 CURSOR ON
 				LCD_SendCmd (0x0d | ((c & 0x01) << 1));	// hd44780 
 			}
-
-
-
 		}
-		
-
-
-		
-/*
-
-
-		if (gotData) {
-			gotData = 0;
-
-			if (rs) {
-				//LCD_SendChar (sed_byte);
-				LCD_PutChar (sed_byte);
-			}	
-
-			if (LCDCol > 12)
-				LCD_SendChar ('!');
-
-
-		}
-*/
-
 	}
 
 }
@@ -179,8 +100,6 @@ int main () {
  *
  ***********************************************************************/
 ISR(INT0_vect) {
-	sei ();
-
 	count_e = 0;
 }
 
