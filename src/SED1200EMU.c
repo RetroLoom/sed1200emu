@@ -2,67 +2,49 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+#include "atmega.h"
 #include "lcd.h"
 #include "tables.h"
 
-volatile uint8_t sed_byte;
-volatile uint8_t rs;
-volatile uint8_t count_e;
-
 int SED_ROWS = 2;
 int SED_COLS = 20;
-uint8_t SEDBuffer [2][20];
+volatile uint8_t SEDBuffer [2][20];
 volatile uint8_t SEDRow = 0, SEDCol = 0;
 
 extern volatile uint8_t queueHead, queueTail;
 
-uint8_t xlat [16] = {
-	0b0000, 0b1000, 0b0010, 0b1010,
-	0b0100, 0b1100, 0b0110, 0b1110,
-	0b0001, 0b1001, 0b0011, 0b1011,
-	0b0101, 0b1101, 0b0111, 0b1111
-};
+void updateDisplay()
+{
+    // Draw buffer to display
+	uint8_t row;
+    for (row = 0; row < 1; row++)  // Iterate both rows
+    {
+        // Set the cursor to the start of the current row
+        uint8_t cursorPos = (row == 0 ? 0x00 : 0x40);  // DDRAM addresses
+        LCD_SendCmd(LCD_SET_CURSOR | cursorPos);
+        
+        // Draw each column in the row
+		uint8_t col;
+        for (col = 0; col < LCD_COLS; col++)
+        {
+            uint8_t c = SEDBuffer[row][col];
+            //if (c == 0x00) {
+            //	c = ASCII_SPACE;  // Replace NULL bytes with spaces
+            //}
+            LCD_SendChar(c);  // Send character to display
+        }
+    }
+}
 
-int main () {
-
-
-
-	// PORT B
-	// ---------------------------
-	// PB3		(LCD) D7		o
-	// PB2		(LCD) D6		o
-	// PB1		(LCD) D5		o
-	// PB0		(LCD) D4		o
-
-	DDRB =	0xF;
-
-	// PORT C
-	// ---------------------------
-	// PC4		(SED1200) RS	i
-	// PC3		(SED1200) D0	i
-	// PC2		(SED1200) D2	i
-	// PC1		(SED1200) D1	i
-	// PC0		(SED1200) D3	i
-
-	DDRC = 0;
-
-	// PORT D
-	// --------------------------
-	// PD7		(LCD) E			o
-	// PD6		(LCD) RS 		o
-	// PD3		(SED1200) E 	i aka INT1
-	// PD2		(SED1200) CS 	i aka INT0
-
-	DDRD = 0xC0;
-
-	MCUCR = _BV(ISC11) | _BV(ISC10) |		// 11 - INT1 rising edge
-			_BV(ISC01);						// 10 - INT0 falling edge
-
-	GICR = _BV(INT1) | _BV(INT0);			// enable INT1 and INT0
-
+int main () 
+{
+	ATMEGA_Init();
 	LCD_Init ();
-	sei ();
-	
+		
 	// Display initial message after initialization
 	LCD_Home ();
 	LCD_SendStr(" ** Roland MT-32 ** "); 
@@ -74,6 +56,10 @@ int main () {
     LCD_SendChar(CGRAM_ON); LCD_SendChar(CGRAM_ON); LCD_SendChar(CGRAM_ON);
     LCD_SendChar(CGRAM_OFF); LCD_SendChar(CGRAM_ON); LCD_SendChar(CGRAM_ON);
     LCD_SendChar(CGRAM_ON); LCD_SendChar(CGRAM_OFF);
+
+	int page = 1;
+	uint32_t last_update = 0; // Initialize a timestamp variable
+    uint32_t delay_interval = 2000; // Set delay in milliseconds
 
 	while (1)
 	{
@@ -102,6 +88,11 @@ int main () {
 					SEDRow = 1;
 					SEDCol = address - 0x40; // Subtract 0x40 to get the column in Row 1
 				}
+
+				page = 1;
+
+				//LCD_GotoXY (1,0);
+				//LCD_SendStr ("%d", SEDCol);
 			}
 			else
 			{
@@ -125,8 +116,8 @@ int main () {
 				}
 
 				// Send the character to the LCD; if it's '|', send the CGRAM custom char 0 instead
-				//LCD_SendChar((c == 0x7c) ? 0x00 : c); // Convert '|' (0x7c) to CGRAM character 0
-				SEDBuffer[SEDRow][SEDCol] = c;
+				LCD_SendChar((c == 0x7c) ? 0x00 : c); // Convert '|' (0x7c) to CGRAM character 0
+				//SEDBuffer[SEDRow][SEDCol] = c;
 				
 				// Move the cursor within the buffer for the next character
 				if (++SEDCol >= SED_COLS)
@@ -145,89 +136,10 @@ int main () {
 		}
 		else
 		{
-			// Draw buffer to display
-			uint8_t row;
-			for (row = 0; row < 2; row++)
-			{
-				// Set the cursor to the start of the current row
-				LCD_SendCmd(LCD_SET_CURSOR | (row == 0 ? 0x00 : 0x40));
+			//updateDisplay();
 
-				// Draw the row
-				uint8_t col;
-				for (col = 0; col < SED_COLS; col++)
-				{
-					uint8_t c = SEDBuffer[row][col];
-					switch (c)
-					{
-						case 0x00:
-						c = ASCII_SPACE;
-						break;
-
-					default:
-						// No conversion needed for other values of c
-						break;
-					}
-
-					LCD_SendChar(c);
-				}
-			}
+			//LCD_GotoXY (1,16);
+			//LCD_SendStr ("%d", millis);			
 		}
 	}
 }
-
-/***********************************************************************
- *
- * INT0 (CS)
- *
- ***********************************************************************/
-ISR(INT0_vect) {
-	count_e = 0;
-}
-
-
-/***********************************************************************
- *
- * INT1 (E)
- *
- ***********************************************************************/
-ISR(INT1_vect) {
-//	sei ();
-
-	if (!(count_e & 0x01)) {
-		// upper data D7...D4
-		sed_byte = xlat [(PINC & 0x0f)] << 4;
-	}
-	else {
-		// lower data D3...D0
-		sed_byte |= xlat [(PINC & 0x0f)];
-		rs = PINC & _BV(PC4);		
-
-		if (rs) {
-			// data
-			LCD_Enqueue (sed_byte);
-		}
-		else {
-			// command
-			switch (sed_byte & 0xc0) {				
-				case 0x80:
-					LCD_Enqueue (sed_byte);
-					break;
-				case 0xc0:
-					LCD_Enqueue (0x80 + 10 + (sed_byte & 0x3f));
-					break;
-				default:
-					break;
-
-			}
-
-//			if ((sed_byte & 0xc0) == 0x80) {	// SET CURSOR ADDR
-//				LCD_Enqueue (sed_byte);
-//			}
-		}	
-	}
-
-	count_e ++;
-	
-}
-
-

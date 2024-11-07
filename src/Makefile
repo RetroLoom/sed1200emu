@@ -6,7 +6,7 @@ F_CPU=8000000UL
 CFLAGS=-mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os -Wall
 
 # Source and output files
-SRC=SED1200EMU.c lcd.c
+SRC=SED1200EMU.c lcd.c atmega.c
 OBJ=$(SRC:.c=.o)
 TARGET=SED1200EMU
 

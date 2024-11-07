@@ -3,26 +3,21 @@
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
+#include "atmega.h"
 #include "lcd.h"
 #include "tables.h"
 
 #define QUEUELEN	256
 
-uint8_t LCDBuffer [2][20];
+volatile uint8_t LCDBuffer [2][20];
 volatile uint8_t LCDRow = 0, LCDCol = 0;
 volatile uint8_t lcdIdx = 0;
 
-
 volatile uint8_t queueHead, queueTail;
 uint8_t queue [QUEUELEN];
-
-// Timer0 Configuration for Compare Match mode
-#define OCR0    _SFR_IO8(0x3C)  // Compare Match register
-#define TCCR0   _SFR_IO8(0x33)  // Timer/Counter Control register
-#define TIMSK   _SFR_IO8(0x39)  // Timer Interrupt Mask register
-#define WGM01   3               // Bit 3 in TCCR0 for CTC mode
-#define OCIE0   1               // Bit 1 in TIMSK to enable compare match interrupt
 
 /*
 
@@ -111,11 +106,6 @@ void LCD_Init() {
     PORTB = 0x0C;  // Send 0x0C for display control (Display ON)
     _E();          
     _delay_ms(2);  
-
-    // Timer0 Configuration for Compare Match mode
-    OCR0 = 5;  // Set the compare match value (adjust as needed)
-    TCCR0 = (1 << WGM01) | (1 << CS02) | (1 << CS00);  // CTC mode, prescaler clk/1024
-    TIMSK |= (1 << OCIE0);  // Enable Timer0 compare match interrupt
 }
 
 
@@ -169,26 +159,6 @@ void LCD_SendCmd (uint8_t c) {
         _E();
 }
 
-ISR(TIMER0_COMP_vect) {
-
-
-        //sei ();	
-        
-		lcdIdx ++;
-		
-		if (lcdIdx >= 40)
-			lcdIdx = 0;
-
-		if (lcdIdx == 0)
-			LCD_SendCmd (0x80);
-
-		if (lcdIdx == 20)
-			LCD_SendCmd (0xc0);
-
-		//LCD_SendChar (LCDBuffer [lcdIdx]);
-		
-
-}
 
 void LCD_GotoXY (uint8_t row, uint8_t col) {
 	uint8_t address = 0x00;
@@ -265,15 +235,20 @@ uint8_t b, i = 0;
 	}
 }
 
-void LCD_SendStr(const char *text)
+void LCD_SendStr(const char *format, ...)
 {
-	uint8_t i = 0;
-	for (i = 0; i < LCD_COLS; i++)
+	char text[64] = "";
+	va_list args;
+	va_start ( args, format );
+	vsprintf ( text, format, args );
+
+	uint8_t i;
+	for (i = 0; i < strlen(text); i++)
 		LCD_SendChar(text[i]);
 }
 
-void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t length) {
-    
+void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t length) 
+{    
 	if (strlen(text) <= length) {
         LCD_GotoXY(row, 0);
         LCD_SendStr(text);
@@ -292,7 +267,10 @@ void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t len
             }
 
             // Delay to control scrolling speed
-            _delay_ms(delay_ms);
+            uint16_t count;
+            for (count = 0; count < delay_ms; count++) {
+                _delay_ms(1);  // Delay by 1 ms each iteration
+            }
         }
     }
 }

@@ -1,10 +1,10 @@
 #define E	PD7
 #define RS	PD6
 
-#define F_CPU 8000000UL
-
 #define LCD_ROWS  2
 #define LCD_COLS  20
+
+extern volatile uint8_t LCDBuffer [2][20];
 
 #define DISP_ON                         0b00001100      //LCD control constants
 #define DISP_OFF                        0b00001000      //
@@ -33,5 +33,5 @@ void LCD_Enqueue(uint8_t c);
 void LCD_GotoXY (uint8_t row, uint8_t col);
 void LCD_Home ();
 
-void LCD_SendStr(const char *text);
+void LCD_SendStr(const char *format, ...);
 void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t length);
