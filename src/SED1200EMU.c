@@ -3,10 +3,16 @@
 #include <util/delay.h>
 
 #include "lcd.h"
+#include "tables.h"
 
 volatile uint8_t sed_byte;
 volatile uint8_t rs;
 volatile uint8_t count_e;
+
+int SED_ROWS = 2;
+int SED_COLS = 20;
+uint8_t SEDBuffer [2][20];
+volatile uint8_t SEDRow = 0, SEDCol = 0;
 
 extern volatile uint8_t queueHead, queueTail;
 
@@ -58,40 +64,115 @@ int main () {
 	sei ();
 	
 	// Display initial message after initialization
-	//LCD_ScrollStr(" ** Roland MT-32 ** ", 0, 300, 20);  // 300ms delay for scrolling speed
 	LCD_Home ();
 	LCD_SendStr(" ** Roland MT-32 ** "); 
+	//LCD_ScrollStr("                    ** Roland MT-32 **                    ", 0, 300, 20);  // 300ms delay for scrolling speed
     _delay_ms(2000);
 
 	// program CGRAM symbol 00
-    LCD_SendCmd(0x40);
-    LCD_SendChar(0x04); LCD_SendChar(0x04); LCD_SendChar(0x04);
-    LCD_SendChar(0x00); LCD_SendChar(0x04); LCD_SendChar(0x04);
-    LCD_SendChar(0x04); LCD_SendChar(0x00);
+    LCD_SendCmd(CGRAM1_SET);
+    LCD_SendChar(CGRAM_ON); LCD_SendChar(CGRAM_ON); LCD_SendChar(CGRAM_ON);
+    LCD_SendChar(CGRAM_OFF); LCD_SendChar(CGRAM_ON); LCD_SendChar(CGRAM_ON);
+    LCD_SendChar(CGRAM_ON); LCD_SendChar(CGRAM_OFF);
 
-	while (1) {
- 		if (queueHead != queueTail) {
-			uint8_t c = LCD_Dequeue ();
-			
-			if ((c & 0xc0) == 0x80)
-				LCD_SendCmd (c);
-			else {
+	while (1)
+	{
+		// Check if there is data in the queue
+		if (queueHead != queueTail)
+		{
+			// Dequeue the next character or command to process
+			uint8_t c = LCD_Dequeue();
 
-				if (c == 0x02)
-					c = 0x7c;
+			// Check if the dequeued byte is a command for the LCD
+			if ((c & 0xC0) == LCD_SET_CURSOR)
+			{								// Check if top two bits of `c` are `10` (indicating a cursor set command)
+				uint8_t address = c & 0x3F; // Extract the DDRAM address (lower 6 bits)
+
+				// Send the command to set the cursor position to this address
+				LCD_SendCmd(LCD_SET_CURSOR | address); // Send the cursor position command to the LCD
+
+				// Determine the row and column based on the address
+				if (address < 0x40)
+				{ // Row 0
+					SEDRow = 0;
+					SEDCol = address; // Column is the address itself for Row 0
+				}
+				else
+				{ // Row 1
+					SEDRow = 1;
+					SEDCol = address - 0x40; // Subtract 0x40 to get the column in Row 1
+				}
+			}
+			else
+			{
+				switch (c)
+				{
+				case 0x02:
+					c = CGRAM1;
+					break;
+
+				case 0x01:
+					c = 0xff; // Convert 0x01 to 0xff (special character in CGRAM)
+					break;
+
+				case 0x7c:
+					c = CGRAM1;
+					break;
+
+				default:
+					// No conversion needed for other values of c
+					break;
+				}
+
+				// Send the character to the LCD; if it's '|', send the CGRAM custom char 0 instead
+				//LCD_SendChar((c == 0x7c) ? 0x00 : c); // Convert '|' (0x7c) to CGRAM character 0
+				SEDBuffer[SEDRow][SEDCol] = c;
 				
-				if (c == 0x01)
-					c = 0xff;
-
-				LCD_SendChar ((c == 0x7c) ? 0x00: c);	// instead '|' (0x7c) send CGRAM char 0
+				// Move the cursor within the buffer for the next character
+				if (++SEDCol >= SED_COLS)
+				{ // Wrap to the next line if at the end of the row
+					SEDCol = 0;
+					SEDRow = (SEDRow + 1) % 2; // Toggle between Row 0 and Row 1
+				}
 			}
 
-			if ((c & 0x0e) == 0x0e) {	// sed1200 CURSOR ON
-				LCD_SendCmd (0x0d | ((c & 0x01) << 1));	// hd44780 
+			// Check if the command involves turning on the cursor
+			if ((c & 0x0e) == 0x0e)
+			{ // Check if bits 1-3 of `c` match the cursor-on command for the SED1200
+				// Send the equivalent HD44780 command to turn on the cursor
+				LCD_SendCmd(0x0d | ((c & 0x01) << 1)); // Map cursor setting to HD44780 format
+			}
+		}
+		else
+		{
+			// Draw buffer to display
+			uint8_t row;
+			for (row = 0; row < 2; row++)
+			{
+				// Set the cursor to the start of the current row
+				LCD_SendCmd(LCD_SET_CURSOR | (row == 0 ? 0x00 : 0x40));
+
+				// Draw the row
+				uint8_t col;
+				for (col = 0; col < SED_COLS; col++)
+				{
+					uint8_t c = SEDBuffer[row][col];
+					switch (c)
+					{
+						case 0x00:
+						c = ASCII_SPACE;
+						break;
+
+					default:
+						// No conversion needed for other values of c
+						break;
+					}
+
+					LCD_SendChar(c);
+				}
 			}
 		}
 	}
-
 }
 
 /***********************************************************************

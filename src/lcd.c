@@ -5,10 +5,11 @@
 #include <string.h>
 
 #include "lcd.h"
+#include "tables.h"
 
 #define QUEUELEN	256
 
-uint8_t LCDBuffer [20 * 2];
+uint8_t LCDBuffer [2][20];
 volatile uint8_t LCDRow = 0, LCDCol = 0;
 volatile uint8_t lcdIdx = 0;
 
@@ -16,14 +17,12 @@ volatile uint8_t lcdIdx = 0;
 volatile uint8_t queueHead, queueTail;
 uint8_t queue [QUEUELEN];
 
-
 // Timer0 Configuration for Compare Match mode
 #define OCR0    _SFR_IO8(0x3C)  // Compare Match register
 #define TCCR0   _SFR_IO8(0x33)  // Timer/Counter Control register
 #define TIMSK   _SFR_IO8(0x39)  // Timer Interrupt Mask register
 #define WGM01   3               // Bit 3 in TCCR0 for CTC mode
 #define OCIE0   1               // Bit 1 in TIMSK to enable compare match interrupt
-
 
 /*
 
@@ -33,24 +32,12 @@ uint8_t queue [QUEUELEN];
 
 */
 
-
-/***************************************************
- *
- * _E
- *
- ***************************************************/
 void _E () {	
 	PORTD |= _BV(E);
 	_delay_us (100);		// 100
 	PORTD &= ~_BV(E);	
 }
 
-
-/***************************************************
- *
- * LCD_Enqueue
- *
- ***************************************************/
 void LCD_Enqueue (uint8_t c) {
 
 	queue [queueHead++] = c;
@@ -59,11 +46,6 @@ void LCD_Enqueue (uint8_t c) {
 
 }
 
-/***************************************************
- *
- * LCD_Dequeue
- *
- ***************************************************/
 uint8_t LCD_Dequeue () {
 uint8_t c;
 
@@ -75,12 +57,8 @@ uint8_t c;
 
 }
 
-/***************************************************
- *
- * LCD_Init
- *
- ***************************************************/
 void LCD_Init() {	
+	
     // Initial delay for LCD power-up
     _delay_ms(50);
 
@@ -158,6 +136,15 @@ void LCD_SendChar (uint8_t c) {
         _E();
 }
 
+void LCD_SendCharAt(uint8_t row, uint8_t col, uint8_t c)
+{
+	if (row < LCD_ROWS && col < LCD_COLS)
+	{
+		LCD_GotoXY(col, row);	 // Set cursor position
+		LCD_SendChar(c);		 // Send character to LCD
+		LCDBuffer[row][col] = c; // Update buffer
+	}
+}
 
 //--------Send command to LCD-----------------------------
 void LCD_SendCmd (uint8_t c) {
@@ -182,12 +169,6 @@ void LCD_SendCmd (uint8_t c) {
         _E();
 }
 
-
-/***************************************************
- *
- * ISR TIMER0_COMPA_vect
- *
- ***************************************************/
 ISR(TIMER0_COMP_vect) {
 
 
@@ -204,16 +185,11 @@ ISR(TIMER0_COMP_vect) {
 		if (lcdIdx == 20)
 			LCD_SendCmd (0xc0);
 
-		LCD_SendChar (LCDBuffer [lcdIdx]);
+		//LCD_SendChar (LCDBuffer [lcdIdx]);
 		
 
 }
 
-/***************************************************
- *
- * LCD_GotoXY
- *
- ***************************************************/
 void LCD_GotoXY (uint8_t row, uint8_t col) {
 	uint8_t address = 0x00;
     if (row == 0) {
@@ -227,49 +203,41 @@ void LCD_GotoXY (uint8_t row, uint8_t col) {
 	LCDCol = col;
 }
 
-/***************************************************
- *
- * LCD_Home	
- *
- ***************************************************/
 void LCD_Home () {
 	LCD_GotoXY (0,0);
 	LCDCol = LCDRow = 0;
 };
 
-/***************************************************
- *
- * LCD_Clear
- *
- ***************************************************/
-void LCD_Clear () {
-uint8_t i;
-	for (i = 0; i < 40; i++)
-		LCDBuffer [i] = 0x20;
+void LCD_Clear() {
+    // Clear the buffer by setting each cell to a space (0x20)
+	uint8_t row;
+    for (row = 0; row < LCD_ROWS; row++) {
+		uint8_t col;
+        for (col = 0; col < LCD_COLS; col++) {
+            LCDBuffer[row][col] = ASCII_SPACE;  // 0x20 is the ASCII code for space
+        }
+    }
 
-	LCD_Home ();
-};
-
-/***************************************************
- *
- * LCD_PutChar
- *
- ***************************************************/
-void LCD_PutChar (uint8_t c) {
-	LCDBuffer [LCDRow * 16 + LCDCol] = c;
-	if (++LCDCol >= 16) {
-		LCDCol = 0;
-		if (++LCDRow >= 2)
-			LCDRow = 0;
-	}
+    // Clear the physical LCD and reset the cursor to the home position
+    LCD_SendCmd(CLR_DISP);  // Clear display command for the HD44780
+    LCD_Home();              // Move the cursor to the home position (0,0)
 }
 
+void LCD_PutChar(uint8_t c) {
+    // Place the character in the buffer at the current row and column
+    if (LCDRow < LCD_ROWS && LCDCol < LCD_COLS) {
+        LCDBuffer[LCDRow][LCDCol] = c;
+    }
 
-/***************************************************
- *
- * LCD_PutHex
- *
- ***************************************************/
+    // Update the column position and handle wrapping
+    if (++LCDCol >= LCD_COLS) {  // Wrap to the next row if we exceed the column limit
+        LCDCol = 0;
+        if (++LCDRow >= LCD_ROWS) {
+            LCDRow = 0;  // Wrap to the top row if we exceed the row limit
+        }
+    }
+}
+
 void LCD_PutHex (uint8_t c) {
 unsigned char hi, lo;
 
@@ -281,22 +249,11 @@ unsigned char hi, lo;
 
 }
 
-
-/***************************************************
- *
- * LCD_PutString
- *
- ***************************************************/
 void LCD_PutString (uint8_t *s) {
 	while (*s)
 		LCD_PutChar (*s++);
 }
 
-/***************************************************
- *
- * LCD_PutPGMString
- *
- ***************************************************/
 void LCD_PutPGMString (const char *s) {
 uint8_t b, i = 0;	
 	while (1) {
@@ -311,11 +268,8 @@ uint8_t b, i = 0;
 void LCD_SendStr(const char *text)
 {
 	uint8_t i = 0;
-	while (i < 20)
-	{
+	for (i = 0; i < LCD_COLS; i++)
 		LCD_SendChar(text[i]);
-		i++;
-	}
 }
 
 void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t length) {
@@ -324,21 +278,21 @@ void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t len
         LCD_GotoXY(row, 0);
         LCD_SendStr(text);
     } else {
-		uint8_t offset = 0;
-
-        while (offset <= strlen(text) - length) {
+		uint8_t offset;
+		for (offset = 0; offset <= strlen(text) - length; offset++)
+		{
             LCD_GotoXY(row, 0);  // Move cursor to the start of the row
 
             // Display 20 characters from the current offset
-			uint8_t i = 0;
-            while (i < 20) {
+			uint8_t i;
+			for (i = 0; i < LCD_COLS; i++)
+			{
+			
                 LCD_SendChar(text[offset + i]);
-				i++;
             }
 
             // Delay to control scrolling speed
             _delay_ms(delay_ms);
-			offset++;
         }
     }
 }
