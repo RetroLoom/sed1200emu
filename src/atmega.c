@@ -61,7 +61,7 @@ void ATMEGA_Init()
 	GICR = _BV(INT1) | _BV(INT0);			// enable INT1 and INT0
 
     //Timer0_Init();
-	//Timer1_Init();
+	Timer1_Init();
 	//Timer2_Init();
 
     sei ();
@@ -75,19 +75,19 @@ void Timer0_Init() {
 }
 
 void Timer1_Init() {
-    // Set up Timer1 for 1 ms overflow
+    /* Set up Timer1 for 1 ms overflow
     TCCR1A = 0;                     // Set Timer1 to normal mode
     TCCR1B = (1 << WGM12) | (1 << CS11); // CTC mode, prescaler of 8
-    OCR1A = 50999;                    // Output compare match value for 1ms at 8 MHz/8 prescaler
+    OCR1A = 999;                    // Output compare match value for 1ms at 8 MHz/8 prescaler
     TIMSK = (1 << OCIE1A);         // Enable output compare A match interrupt
-	//
+	*/
 
-	/* Set up Timer1 for direct updateDisplay()
+	// Set up Timer1 for direct updateDisplay()
 	TCCR1B |= (1 << WGM12);      // Configure Timer1 in CTC mode
     TCCR1B |= (1 << CS11) | (1 << CS10); // Set prescaler to 64
     OCR1A = 12500;               // Set compare value for 100 ms interval
     TIMSK |= (1 << OCIE1A);      // Enable Timer1 compare match A interrupt
-	*/
+	//
 
 	/* Set up Timer1 for a 1-second interval
 	TCCR1A = 0;				// Set Timer1 to normal mode (CTC)
@@ -105,9 +105,8 @@ void Timer2_Init() {
 	TIMSK |= (1 << OCIE2);				// Enable output compare A match interrupt
 }
 
-ISR(TIMER0_COMPA_vect) {
-
-		millis++;
+//ISR(TIMER0_COMPA_vect) 
+//{
         
         /*
 		lcdIdx ++;
@@ -125,16 +124,17 @@ ISR(TIMER0_COMPA_vect) {
 		//LCD_SendChar (LCDBuffer [lcdIdx]);
 		
 		//updateDisplay();
-}
+//}
 
 // Timer1 compare match ISR, triggers every 1 ms
 ISR(TIMER1_COMPA_vect) {
-    millis += 1;
+    millis += 100;
+    //updateDisplay();
 }
 
-ISR(TIMER2_COMPA_vect) {
-    millis++;
-}
+//ISR(TIMER2_COMPA_vect) {
+//    millis++;
+//}
 
 ISR(INT0_vect) {
 	count_e = 0;

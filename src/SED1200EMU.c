@@ -10,10 +10,14 @@
 #include "lcd.h"
 #include "tables.h"
 
-int SED_ROWS = 2;
-int SED_COLS = 20;
 volatile uint8_t SEDBuffer [2][20];
 volatile uint8_t SEDRow = 0, SEDCol = 0;
+
+uint8_t SEC_POS = 0;
+uint8_t SEC_COL = 0;
+uint8_t SEC_OFFSET = 0;
+uint8_t SEC_SHOW = 0;
+uint32_t SEC_LAST_UPDATE = 0;
 
 extern volatile uint8_t queueHead, queueTail;
 
@@ -37,7 +41,49 @@ void updateDisplay()
             //}
             LCD_SendChar(c);  // Send character to display
         }
-    }
+	}
+	//
+
+	// Draw buffer to display
+	//uint8_t row;
+    for (row = 1; row < 2; row++)  // Iterate both rows
+    {
+        // Set the cursor to the start of the current row
+        uint8_t cursorPos = (row == 0 ? 0x00 : 0x40);  // DDRAM addresses
+        LCD_SendCmd(LCD_SET_CURSOR | cursorPos);
+        
+        // Draw each column in the row
+		uint8_t col;
+		if (SEC_SHOW)
+		{
+			for (col = 0; col < SEC_COL + SEC_OFFSET; col++)
+			{
+				uint8_t c = SEDBuffer[0][SEC_POS + col];
+				// if (c == 0x00) {
+				//	c = ASCII_SPACE;  // Replace NULL bytes with spaces
+				// }
+				LCD_SendChar(c); // Send character to display
+			}
+
+			// Clear empty space
+			for (col = 0; col < 20 - SEC_COL + SEC_OFFSET; col++)
+            	LCD_SendChar(ASCII_SPACE);  // Send character to display
+		}
+		else
+		{
+			for (col = 0; col <= SEC_POS - SEC_OFFSET + 1; col++)
+			{
+				uint8_t c = SEDBuffer[0][col];
+				// if (c == 0x00) {
+				//	c = ASCII_SPACE;  // Replace NULL bytes with spaces
+				// }
+				LCD_SendChar(c); // Send character to display
+			}
+		}
+
+		
+
+	}
 }
 
 int main () 
@@ -75,7 +121,7 @@ int main ()
 				uint8_t address = c & 0x3F; // Extract the DDRAM address (lower 6 bits)
 
 				// Send the command to set the cursor position to this address
-				LCD_SendCmd(LCD_SET_CURSOR | address); // Send the cursor position command to the LCD
+				//LCD_SendCmd(LCD_SET_CURSOR | address); // Send the cursor position command to the LCD
 
 				// Determine the row and column based on the address
 				if (address < 0x40)
@@ -89,9 +135,28 @@ int main ()
 					SEDCol = address - 0x40; // Subtract 0x40 to get the column in Row 1
 				}
 
+				if (SEDCol == 17)
+				{
+					SEC_OFFSET = 4;
+					SEC_POS = SEDCol - SEC_OFFSET;
+					SEC_COL = 0;
+					SEC_SHOW = 1;
+					SEC_LAST_UPDATE = millis;
+				}
+				//else
+				//{
+				//	SED_SEC_COL = 0;
+				//}
+
+				if (SEDCol == 0)
+				{
+					SEC_COL = 0;
+					//SEC_SHOW = 0;
+				}
+
 				page = 1;
 
-				//LCD_GotoXY (1,0);
+				//LCD_GotoXY (1,17);
 				//LCD_SendStr ("%d", SEDCol);
 			}
 			else
@@ -116,11 +181,14 @@ int main ()
 				}
 
 				// Send the character to the LCD; if it's '|', send the CGRAM custom char 0 instead
-				LCD_SendChar((c == 0x7c) ? 0x00 : c); // Convert '|' (0x7c) to CGRAM character 0
-				//SEDBuffer[SEDRow][SEDCol] = c;
+				//LCD_SendChar((c == 0x7c) ? 0x00 : c); // Convert '|' (0x7c) to CGRAM character 0
+				SEDBuffer[SEDRow][SEDCol] = c;
+
+				if (SEC_POS)
+					SEC_COL++;
 				
 				// Move the cursor within the buffer for the next character
-				if (++SEDCol >= SED_COLS)
+				if (++SEDCol >= 20)
 				{ // Wrap to the next line if at the end of the row
 					SEDCol = 0;
 					SEDRow = (SEDRow + 1) % 2; // Toggle between Row 0 and Row 1
@@ -136,9 +204,14 @@ int main ()
 		}
 		else
 		{
-			//updateDisplay();
+			if ((millis - SEC_LAST_UPDATE) >= 2000)
+			{
+				SEC_SHOW = 0;
+			}
 
-			//LCD_GotoXY (1,16);
+			updateDisplay();
+
+			//LCD_GotoXY (1,15);
 			//LCD_SendStr ("%d", millis);			
 		}
 	}

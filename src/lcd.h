@@ -6,6 +6,11 @@
 
 extern volatile uint8_t LCDBuffer [2][20];
 
+extern volatile uint8_t SEDBuffer [2][20];
+extern volatile uint8_t SEDRow, SEDCol;
+
+extern volatile uint8_t queueHead, queueTail;
+
 #define DISP_ON                         0b00001100      //LCD control constants
 #define DISP_OFF                        0b00001000      //
 #define CLR_DISP                        0b00000001      //
@@ -35,3 +40,5 @@ void LCD_Home ();
 
 void LCD_SendStr(const char *format, ...);
 void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t length);
+
+void updateDisplay();
