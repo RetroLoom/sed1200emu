@@ -14,6 +14,8 @@ volatile uint8_t SEDBuffer [2][20];
 volatile uint8_t SEDRow = 0, SEDCol = 0;
 extern volatile uint8_t queueHead, queueTail;
 
+int8_t bufferDisplay = 0;
+
 void updateDisplay()
 {
     // Draw buffer to display
@@ -66,20 +68,23 @@ int main ()
 			if ((c & 0xC0) == LCD_SET_CURSOR)
 			{								// Check if top two bits of `c` are `10` (indicating a cursor set command)
 				uint8_t address = c & 0x3F; // Extract the DDRAM address (lower 6 bits)
-
-				// Send the command to set the cursor position to this address
-				//LCD_SendCmd(LCD_SET_CURSOR | address); // Send the cursor position command to the LCD
-
-				// Determine the row and column based on the address
-				if (address < 0x40)
-				{ // Row 0
-					SEDRow = 0;
-					SEDCol = address; // Column is the address itself for Row 0
-				}
+			
+				if (!bufferDisplay)
+					// Send the command to set the cursor position to this address
+					LCD_SendCmd(LCD_SET_CURSOR | address); // Send the cursor position command to the LCD
 				else
-				{ // Row 1
-					SEDRow = 1;
-					SEDCol = address - 0x40; // Subtract 0x40 to get the column in Row 1
+				{
+					// Determine the row and column based on the address
+					if (address < 0x40)
+					{ // Row 0
+						SEDRow = 0;
+						SEDCol = address; // Column is the address itself for Row 0
+					}
+					else
+					{ // Row 1
+						SEDRow = 1;
+						SEDCol = address - 0x40; // Subtract 0x40 to get the column in Row 1
+					}
 				}
 			}
 			else
@@ -103,15 +108,18 @@ int main ()
 					break;
 				}
 
-				// Send the character to the LCD; if it's '|', send the CGRAM custom char 0 instead
-				//LCD_SendChar((c == 0x7c) ? 0x00 : c); // Convert '|' (0x7c) to CGRAM character 0
-				SEDBuffer[SEDRow][SEDCol] = c;			
-				
-				// Move the cursor within the buffer for the next character
-				if (++SEDCol >= 20)
-				{ // Wrap to the next line if at the end of the row
-					SEDCol = 0;
-					SEDRow = (SEDRow + 1) % 2; // Toggle between Row 0 and Row 1
+				if (!bufferDisplay)
+					LCD_SendChar(c);
+				else
+				{
+					SEDBuffer[SEDRow][SEDCol] = c;
+
+					// Move the cursor within the buffer for the next character
+					if (++SEDCol >= 20)
+					{ // Wrap to the next line if at the end of the row
+						SEDCol = 0;
+						SEDRow = (SEDRow + 1) % 2; // Toggle between Row 0 and Row 1
+					}
 				}
 			}
 
@@ -129,7 +137,8 @@ int main ()
 			//	SEC_SHOW = 0;
 			//}
 
-			updateDisplay();
+			if (bufferDisplay)
+				updateDisplay();
 
 			//LCD_GotoXY (1,15);
 			//LCD_SendStr ("%d", millis);			
