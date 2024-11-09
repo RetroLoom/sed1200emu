@@ -12,20 +12,13 @@
 
 volatile uint8_t SEDBuffer [2][20];
 volatile uint8_t SEDRow = 0, SEDCol = 0;
-
-int8_t SEC_POS = 0;
-int8_t SEC_SIZE = 0;
-int8_t SEC_OFFSET = 0;
-int8_t SEC_SHOW = 0;
-uint32_t SEC_LAST_UPDATE = 0;
-
 extern volatile uint8_t queueHead, queueTail;
 
 void updateDisplay()
 {
     // Draw buffer to display
 	uint8_t row;
-    for (row = 0; row < 1; row++)  // Iterate both rows
+    for (row = 0; row < 2; row++)  // Iterate both rows
     {
         // Set the cursor to the start of the current row
         uint8_t cursorPos = (row == 0 ? 0x00 : 0x40);  // DDRAM addresses
@@ -42,88 +35,6 @@ void updateDisplay()
             LCD_SendChar(c);  // Send character to display
         }
 	}
-	//
-
-	// Draw buffer to display
-	//uint8_t row;
-    for (row = 1; row < 2; row++)  // Iterate both rows
-    {
-        // Set the cursor to the start of the current row
-        uint8_t cursorPos = (row == 0 ? 0x00 : 0x40);  // DDRAM addresses
-        LCD_SendCmd(LCD_SET_CURSOR | cursorPos);
-        
-        // Draw each column in the row
-		int8_t col;
-		if (SEC_SHOW)
-		{
-			for (col = 0; col <= SEC_SIZE; col++)
-			{
-				uint8_t c = SEDBuffer[0][SEC_POS + col];
-				// if (c == 0x00) {
-				//	c = ASCII_SPACE;  // Replace NULL bytes with spaces
-				// }
-				LCD_SendChar(c); // Send character to display
-			}
-
-			// Clear empty space
-			for (col = 0; col < 20 - SEC_POS; col++)
-				LCD_SendChar(ASCII_SPACE);  // Send character to display
-		}
-		else
-		{
-			for (col = 0; col < SEC_POS; col++)
-			{
-				uint8_t c = SEDBuffer[0][col];
-				// if (c == 0x00) {
-				//	c = ASCII_SPACE;  // Replace NULL bytes with spaces
-				// }
-				LCD_SendChar(c); // Send character to display
-			}
-		}
-	}
-	//
-
-	/* Draw buffer to display - old
-	//uint8_t row;
-    for (row = 1; row < 2; row++)  // Iterate both rows
-    {
-        // Set the cursor to the start of the current row
-        uint8_t cursorPos = (row == 0 ? 0x00 : 0x40);  // DDRAM addresses
-        LCD_SendCmd(LCD_SET_CURSOR | cursorPos);
-        
-        // Draw each column in the row
-		int8_t col;
-		if (SEC_SHOW)
-		{
-			for (col = 0; col <= SEC_SIZE; col++)
-			{
-				uint8_t c = SEDBuffer[0][SEC_POS + col];
-				// if (c == 0x00) {
-				//	c = ASCII_SPACE;  // Replace NULL bytes with spaces
-				// }
-				LCD_SendChar(c); // Send character to display
-			}
-
-			// Clear empty space
-			for (col = 0; col < 20 - SEC_POS; col++)
-				LCD_SendChar(ASCII_SPACE);  // Send character to display
-		}
-		else
-		{
-			for (col = 0; col < SEC_POS; col++)
-			{
-				uint8_t c = SEDBuffer[0][col];
-				// if (c == 0x00) {
-				//	c = ASCII_SPACE;  // Replace NULL bytes with spaces
-				// }
-				LCD_SendChar(c); // Send character to display
-			}
-		}
-
-		
-
-	}
-	*/
 }
 
 int main () 
@@ -170,34 +81,6 @@ int main ()
 					SEDRow = 1;
 					SEDCol = address - 0x40; // Subtract 0x40 to get the column in Row 1
 				}
-
-				/*
-				if (SEDCol == 17)
-				{
-					SEC_OFFSET = -4;
-					SEC_POS = SEDCol + SEC_OFFSET;
-					SEC_SIZE = 1 - SEC_OFFSET;
-					SEC_SHOW = 1;
-					SEC_LAST_UPDATE = millis;
-				}
-
-				if (SEDCol == 9)
-				{
-					SEC_OFFSET = 1;
-					SEC_POS = SEDCol + SEC_OFFSET;
-					SEC_SIZE = 1 - SEC_OFFSET;
-					SEC_SHOW = 1;
-					SEC_LAST_UPDATE = millis;
-				}
-				*/
-
-				//if (SEDCol > 16)
-				//{
-				//	SEC_SIZE = 0;
-				//}
-				
-				//LCD_GotoXY (1,17);
-				//LCD_SendStr ("%d  ", SEDCol);
 			}
 			else
 			{
@@ -205,11 +88,6 @@ int main ()
 				{
 				case 0x02:
 					c = CGRAM1;
-
-					SEC_POS = SEDCol;
-					SEC_SHOW = 1;
-					SEC_SIZE = 20 - SEC_POS;
-					SEC_LAST_UPDATE = millis;
 					break;
 
 				case 0x01:
@@ -223,11 +101,6 @@ int main ()
 				default:
 					// No conversion needed for other values of c
 					break;
-				}
-
-				if (SEDCol > SEC_POS)
-				{
-					
 				}
 
 				// Send the character to the LCD; if it's '|', send the CGRAM custom char 0 instead
@@ -251,10 +124,10 @@ int main ()
 		}
 		else
 		{
-			if ((millis - SEC_LAST_UPDATE) >= 2000)
-			{
-				SEC_SHOW = 0;
-			}
+			//if ((millis - SEC_LAST_UPDATE) >= 2000)
+			//{
+			//	SEC_SHOW = 0;
+			//}
 
 			updateDisplay();
 
