@@ -7,7 +7,7 @@ The main driver and translator for this project is an ATMEGA8L-8AU which can sti
 ### ATMEGA8 Configuration Settings
 When programming the ATMEGA8 it is important to use the correct configuration. This will enable the external clocks and any other flags needed for binary to run correctly. 
 
-<img src='images/ATMEGA8_confg.png'>
+<img src='Images/ATMEGA8_config.png'>
 
 Fuse Low Byte: 0xBF
 Fuse High Bte: 0xD9
