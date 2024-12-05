@@ -4,7 +4,7 @@ This Emulator is intended to replace hard-to-obtain Epson SED1200 based LCD modu
 ## Building and Installation
 The main driver and translator for this project is an ATMEGA8L-8AU which can still be purchased on popular sites like Mouser and Digi-key. This IC may become obsolete, so the intention is to adapt as they become less available. The gerber files, BOM, Binary HEX files will also be provided as they become current and available. All current releases are in beta, and come with no warranty. 
 
-### ATMEGA8 Configuration Settings
+### ATMEGA8 Flashing
 When programming the ATMEGA8 it is important to use the correct configuration. This will enable the external clocks and any other flags needed for binary to run correctly. 
 
 <img src='Images/ATMEGA8_config.png'>
@@ -12,6 +12,11 @@ When programming the ATMEGA8 it is important to use the correct configuration. T
 Fuse Low Byte: 0xBF
 Fuse High Bte: 0xD9
 Lock Bit Byte: 0xFF
+
+### Compiling
+Download and install WinAVR for minimum compiling support. Using command prompt or windows powershell, run make in the src directory.
+
+Note: You can optionally replace the AVR compiling files to manually update to newer versions. 
 
 ### Optional Headers
 There are three headers that are considered optional, but recommended if you are developing or want to reprogram the ATMEGA8 after it is soldered to the board. The SPI header will provide connection for flashing, and the UART header will give you access to feedback and debug information for code development. 
