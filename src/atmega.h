@@ -8,6 +8,9 @@
 extern volatile uint32_t millis;
 
 void ATMEGA_Init();
+void UART_Init(void);
+void UART_SendChar(char c);
+void UART_SendString(const char* str);
 void Timer0_Init();
 void Timer1_Init();
 void Timer2_Init();

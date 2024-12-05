@@ -42,6 +42,7 @@ void updateDisplay()
 int main () 
 {
 	ATMEGA_Init();
+	UART_Init();
 	LCD_Init ();
 		
 	// Display initial message after initialization
