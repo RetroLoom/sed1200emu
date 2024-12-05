@@ -2,6 +2,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -81,7 +82,7 @@ void UART_Init(void) {
     // Set frame format: 8 data bits, no parity, 1 stop bit
     UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
 
-	UART_SendString("UART Initialized\r\n");
+	UART_SendStr("\r\nUART Initialized\r\n");
 }
 
 void UART_SendChar(char c) {
@@ -93,10 +94,24 @@ void UART_SendChar(char c) {
     UDR = c;
 }
 
-void UART_SendString(const char* str) {
-    while (*str) {
-        UART_SendChar(*str++);
-    }
+void UART_SendStr(const char* format, ...) {
+	char text[64] = "";
+	va_list args;
+	va_start ( args, format );
+	vsprintf ( text, format, args );
+
+	uint8_t i;
+	for (i = 0; i < strlen(text); i++)
+		UART_SendChar(text[i]);
+}
+
+void UART_SendHex(uint8_t value) {
+    const char hexDigits[] = "0123456789ABCDEF";
+
+    // Convert high nibble to ASCII and send
+    UART_SendChar(hexDigits[(value >> 4) & 0x0F]);  // High nibble
+    // Convert low nibble to ASCII and send
+    UART_SendChar(hexDigits[value & 0x0F]);         // Low nibble
 }
 
 void Timer0_Init() {

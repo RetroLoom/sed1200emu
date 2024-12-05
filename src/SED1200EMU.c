@@ -41,8 +41,8 @@ void updateDisplay()
 
 int main () 
 {
-	ATMEGA_Init();
 	UART_Init();
+	ATMEGA_Init();
 	LCD_Init ();
 		
 	// Display initial message after initialization
@@ -69,7 +69,15 @@ int main ()
 			if ((c & 0xC0) == LCD_SET_CURSOR)
 			{								// Check if top two bits of `c` are `10` (indicating a cursor set command)
 				uint8_t address = c & 0x3F; // Extract the DDRAM address (lower 6 bits)
-			
+
+				// UART
+				if (address == 0x00 || address == 0x11)
+					UART_SendStr("\r\n");
+
+				UART_SendStr(" (CUR: ");
+				UART_SendHex(address);
+				UART_SendStr(") ");
+
 				if (!bufferDisplay)
 					// Send the command to set the cursor position to this address
 					LCD_SendCmd(LCD_SET_CURSOR | address); // Send the cursor position command to the LCD
