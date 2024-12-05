@@ -1,6 +1,13 @@
 # SED1200Emu
 This Emulator is intended to replace hard-to-obtain Epson SED1200 based LCD modules with common HD44780 ones. The original project page can be found here http://sensi.org/~tnt23/sed1200emu/index.html. The original goal is for having a replacement LCD for the Roland MT-32, but the display could be adapted for other projects. All attempts to reach the original designer have failed. Please reach out to me if you have any information about this. 
 
+<img src='Images/sed1200emu_3d.png'>
+
+<img src='Images/sed1200emu_MT32.jpeg'>
+
+<img src='Images/sed1200emu_home.jpeg'>
+<img src='Images/sed1200emu_closeup.jpeg'>
+
 ## Building and Installation
 The main driver and translator for this project is an ATMEGA8L-8AU which can still be purchased on popular sites like Mouser and Digi-key. This IC may become obsolete, so the intention is to adapt as they become less available. The gerber files, BOM, Binary HEX files will also be provided as they become current and available. All current releases are in beta, and come with no warranty. 
 
@@ -8,15 +15,23 @@ The main driver and translator for this project is an ATMEGA8L-8AU which can sti
 When programming the ATMEGA8 it is important to use the correct configuration. This will enable the external clocks and any other flags needed for binary to run correctly. 
 
 <img src='Images/ATMEGA8_config.png'>
-
 Fuse Low Byte: 0xBF
+
 Fuse High Bte: 0xD9
+
 Lock Bit Byte: 0xFF
+
+<img src='Images/sed1200emu_programmer.jpeg'>
 
 ### Compiling
 Download and install WinAVR for minimum compiling support. Using command prompt or windows powershell, run make in the src directory.
 
 Note: You can optionally replace the AVR compiling files to manually update to newer versions. 
+
+### UART Config
+For debugging or logging display message, connect via serial to GND, TXD, RXD at 9600 baud.
+<img src='Images/sed1200emu_uart.jpeg'>
+<img src='Images/sed1200emu_putty.png'>
 
 ### Optional Headers
 There are three headers that are considered optional, but recommended if you are developing or want to reprogram the ATMEGA8 after it is soldered to the board. The SPI header will provide connection for flashing, and the UART header will give you access to feedback and debug information for code development. 
