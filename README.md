@@ -45,4 +45,5 @@ Another option is to program new methods that adapts the display to a 16x2 LCD. 
 The original release this project is derived from Tim Tashpulatov without license or warranty. The updated revisions of this project released in 2024 include a GPL v3 license which can be found here in the LICENSE file. 
 
 Source code and software license - [GPL v3](https://github.com/skadarnold/sed1200emu/blob/master/LICENSE)
+
 Hardware design license - [CERN OHL-S](https://ohwr.org/project/cernohl/-/wikis/uploads/819d71bea3458f71fba6cf4fb0f2de6b/cern_ohl_s_v2.txt)
