@@ -124,6 +124,8 @@ void LCD_SendChar (uint8_t c) {
         PORTB = (c & 0xF);
 
         _E();
+        
+        UART_SendChar(c);
 }
 
 void LCD_SendCharAt(uint8_t row, uint8_t col, uint8_t c)
