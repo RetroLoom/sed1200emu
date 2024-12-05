@@ -40,3 +40,6 @@ There are three headers that are considered optional, but recommended if you are
 At the moment, 20x2 HD44780 LCD is too large as a direct replacement for the MT-32. Adaptation will be needed in the form of a redesigned 3D printed face plate for the current LCD. If you have interest in helping design something like this, please get in touch! I have searched around for better fitting 20x2 LCD's but I have not found anything that would match. 
 
 Another option is to program new methods that adapts the display to a 16x2 LCD. This might need some elaborate programming to work. 
+
+## License Information
+The original release this project is derived from Tim Tashpulatov without license or warranty. The updated revisions of this project released in 2024 include a GPL v3 license which can be found here in the LICENSE file. 
