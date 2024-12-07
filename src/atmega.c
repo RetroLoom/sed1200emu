@@ -27,10 +27,7 @@
 #include "atmega.h"
 #include "lcd.h"
 #include "tables.h"
-
-#define F_CPU 8000000UL
-#define BAUD 9600        // Desired baud rate
-#define MYUBRR (F_CPU/16/BAUD-1)  // UBRR value for baud rate
+#include "uart.h"
 
 uint8_t xlat [16] = {
 	0b0000, 0b1000, 0b0010, 0b1010,
@@ -85,50 +82,6 @@ void ATMEGA_Init()
 	//Timer2_Init();
 
     sei ();
-}
-
-void UART_Init(void) {
-    // Set baud rate
-    uint16_t ubrr_value = MYUBRR;
-    UBRRH = (uint8_t)(ubrr_value >> 8);  // Upper 8 bits of UBRR
-    UBRRL = (uint8_t)ubrr_value;        // Lower 8 bits of UBRR
-
-    // Enable transmitter and receiver
-    UCSRB = (1 << TXEN) | (1 << RXEN);
-
-    // Set frame format: 8 data bits, no parity, 1 stop bit
-    UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
-
-	UART_SendStr("\r\nUART Initialized\r\n");
-}
-
-void UART_SendChar(char c) {
-    // Wait for the transmit buffer to be empty
-    while (!(UCSRA & (1 << UDRE))) {
-        // Do nothing
-    }
-    // Put the character into the buffer
-    UDR = c;
-}
-
-void UART_SendStr(const char* format, ...) {
-	char text[64] = "";
-	va_list args;
-	va_start ( args, format );
-	vsprintf ( text, format, args );
-
-	uint8_t i;
-	for (i = 0; i < strlen(text); i++)
-		UART_SendChar(text[i]);
-}
-
-void UART_SendHex(uint8_t value) {
-    const char hexDigits[] = "0123456789ABCDEF";
-
-    // Convert high nibble to ASCII and send
-    UART_SendChar(hexDigits[(value >> 4) & 0x0F]);  // High nibble
-    // Convert low nibble to ASCII and send
-    UART_SendChar(hexDigits[value & 0x0F]);         // Low nibble
 }
 
 void Timer0_Init() {

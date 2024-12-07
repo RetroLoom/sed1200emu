@@ -26,6 +26,7 @@
 #include "atmega.h"
 #include "lcd.h"
 #include "tables.h"
+#include "uart.h"
 
 #define QUEUELEN	256
 
@@ -188,6 +189,8 @@ void LCD_GotoXY (uint8_t row, uint8_t col) {
     }
     LCD_SendCmd(LCD_SET_CURSOR | address);
 
+    UART_GotoXY(row, col);
+
 	LCDRow = row;
 	LCDCol = col;
 }
@@ -264,6 +267,8 @@ void LCD_SendStr(const char *format, ...)
 	uint8_t i;
 	for (i = 0; i < strlen(text); i++)
 		LCD_SendChar(text[i]);
+
+    UART_NextRow();
 }
 
 void LCD_ScrollStr(const char *text, uint8_t row, uint16_t delay_ms, uint8_t length) 
