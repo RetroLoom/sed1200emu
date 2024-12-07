@@ -32,6 +32,7 @@ Note: You can optionally replace the AVR compiling files to manually update to n
 For debugging or logging display message, connect via serial to GND, TXD, RXD at 9600 baud.
 <img src='Images/sed1200emu_uart.jpeg'>
 
+UART Serial out display clone (and debugging).
 
 <img src='Images/sed1200emu_putty.gif'>
 
