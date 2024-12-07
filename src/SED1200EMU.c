@@ -9,6 +9,7 @@
 #include "atmega.h"
 #include "lcd.h"
 #include "tables.h"
+#include "uart.h"
 
 volatile uint8_t SEDBuffer [2][20];
 volatile uint8_t SEDRow = 0, SEDCol = 0;
@@ -71,12 +72,26 @@ int main ()
 				uint8_t address = c & 0x3F; // Extract the DDRAM address (lower 6 bits)
 
 				// UART
-				if (address == 0x00 || address == 0x11)
-					UART_SendStr("\r\n");
+	
+				if (uartDebug)
+				{
+					if (address == 0x11)
+						UART_NextRow();
 
-				UART_SendStr(" (CUR: ");
-				UART_SendHex(address);
-				UART_SendStr(") ");
+					UART_SendStr(" (CUR: ");
+					UART_SendHex(address);
+					UART_SendStr(") ");
+				}
+				else
+				{
+					if (address == 0x00)
+					{
+						UART_ClearRow();
+						UART_HideCursor();
+					}
+					
+					UART_GotoY(address);
+				}
 
 				if (!bufferDisplay)
 					// Send the command to set the cursor position to this address
