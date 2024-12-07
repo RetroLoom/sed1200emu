@@ -26,6 +26,7 @@
 
 #include "atmega.h"
 #include "uart.h"
+#include "lcd.h"
 #include "tables.h"
 
 #define F_CPU 8000000UL
@@ -38,13 +39,13 @@ void UART_Init(void) {
     UBRRH = (uint8_t)(ubrr_value >> 8);  // Upper 8 bits of UBRR
     UBRRL = (uint8_t)ubrr_value;        // Lower 8 bits of UBRR
 
-    // Enable transmitter and receiver
-    UCSRB = (1 << TXEN) | (1 << RXEN);
+    UCSRB = (1 << TXEN) | (1 << RXEN); // Enable transmitter and receiver
+    UCSRB |= (1 << RXCIE);  // Enable RX Complete Interrupt
 
     // Set frame format: 8 data bits, no parity, 1 stop bit
     UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
 
-	_delay_us (100);
+	_delay_us (200);
 	UART_ClearScreen();
 	UART_GotoXY(0,0);
 	UART_HideCursor();
@@ -63,10 +64,11 @@ void UART_SendChar(char c) {
     }
 
     switch (c)
-    {
-    case 0x01:
-        c = ASCII_SPACE;
+    {        
+    case CGRAM1:
+        c = ASCII_VERTICAL_BAR;
         break;
+
     default:
         break;
     }
@@ -77,10 +79,12 @@ void UART_SendChar(char c) {
 char UART_ReceiveChar(void) {
     // Wait for data to be received
     while (!(UCSRA & (1 << RXC))) {
-        // Do nothing
+        // Wait until RXC is set
     }
-    // Get and return received data from the buffer
-    return UDR;
+
+    char c = UDR;
+    UART_SendChar(c);
+    return c;
 }
 
 void UART_NextRow (void) {
@@ -178,4 +182,16 @@ void UART_DisableCursorBlink() {
     UART_SendChar('1');
     UART_SendChar('2');
     UART_SendChar('l');   // Disable cursor blink
+}
+
+ISR(USART_RXC_vect) {
+    char c = UDR;  // Read received character
+
+    if (c)
+    {
+        LCD_GotoXY(1, SEDCol);
+        LCD_SendChar(c);
+        SEDCol++;
+        c = 0;
+    }
 }
