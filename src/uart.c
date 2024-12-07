@@ -26,6 +26,7 @@
 
 #include "atmega.h"
 #include "uart.h"
+#include "tables.h"
 
 #define F_CPU 8000000UL
 #define BAUD 38400        // Desired baud rate
@@ -58,9 +59,18 @@ void UART_Init(void) {
 void UART_SendChar(char c) {
     // Wait for the transmit buffer to be empty
     while (!(UCSRA & (1 << UDRE))) {
-        // Do nothing
+        
     }
-    // Put the character into the buffer
+
+    switch (c)
+    {
+    case 0x01:
+        c = ASCII_SPACE;
+        break;
+    default:
+        break;
+    }
+    
     UDR = c;
 }
 
@@ -99,6 +109,8 @@ void UART_SendHex(uint8_t value) {
 }
 
 void UART_GotoXY(uint8_t row, uint8_t col) {
+    row++;
+    col++;
     UART_SendChar(0x1B);           // ESC character
     UART_SendChar('[');            // Start of command
     UART_SendChar('0' + (row / 10)); // Tens place of row
@@ -110,6 +122,7 @@ void UART_GotoXY(uint8_t row, uint8_t col) {
 }
 
 void UART_GotoY(uint8_t col) {
+    col++;
     UART_SendChar(0x1B);           // ESC character
     UART_SendChar('[');            // Start of command
     UART_SendChar('0' + (col / 10)); // Tens place of col

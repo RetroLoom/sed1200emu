@@ -13,6 +13,7 @@
 
 volatile uint8_t SEDBuffer [2][20];
 volatile uint8_t SEDRow = 0, SEDCol = 0;
+uint8_t address = 0;
 extern volatile uint8_t queueHead, queueTail;
 
 int8_t bufferDisplay = 0;
@@ -69,29 +70,21 @@ int main ()
 			// Check if the dequeued byte is a command for the LCD
 			if ((c & 0xC0) == LCD_SET_CURSOR)
 			{								// Check if top two bits of `c` are `10` (indicating a cursor set command)
-				uint8_t address = c & 0x3F; // Extract the DDRAM address (lower 6 bits)
+				address = c & 0x3F; // Extract the DDRAM address (lower 6 bits)
 
 				// UART
+				if (address == 0)
+						UART_HideCursor();
 	
 				if (uartDebug)
 				{
 					if (address == 0x11)
 						UART_NextRow();
 
-					UART_SendStr(" (CUR: ");
-					UART_SendHex(address);
-					UART_SendStr(") ");
+					UART_SendStr(" (C%d) ", address);
 				}
-				else
-				{
-					if (address == 0x00)
-					{
-						UART_ClearRow();
-						UART_HideCursor();
-					}
-					
+				else										
 					UART_GotoY(address);
-				}
 
 				if (!bufferDisplay)
 					// Send the command to set the cursor position to this address
@@ -133,7 +126,10 @@ int main ()
 				}
 
 				if (!bufferDisplay)
-					LCD_SendChar(c);
+				{
+					if (address < 20)
+						LCD_SendChar(c);
+				}
 				else
 				{
 					SEDBuffer[SEDRow][SEDCol] = c;
