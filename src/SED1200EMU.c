@@ -86,22 +86,19 @@ int main ()
 				else										
 					UART_GotoY(address);
 
-				if (!bufferDisplay)
-					// Send the command to set the cursor position to this address
-					LCD_SendCmd(LCD_SET_CURSOR | address); // Send the cursor position command to the LCD
+				// Send the command to set the cursor position to this address
+				LCD_SendCmd(LCD_SET_CURSOR | address); // Send the cursor position command to the LCD
+
+				// Determine the row and column based on the address
+				if (address < 0x40)
+				{ // Row 0
+					SEDRow = 0;
+					SEDCol = address; // Column is the address itself for Row 0
+				}
 				else
-				{
-					// Determine the row and column based on the address
-					if (address < 0x40)
-					{ // Row 0
-						SEDRow = 0;
-						SEDCol = address; // Column is the address itself for Row 0
-					}
-					else
-					{ // Row 1
-						SEDRow = 1;
-						SEDCol = address - 0x40; // Subtract 0x40 to get the column in Row 1
-					}
+				{ // Row 1
+					SEDRow = 1;
+					SEDCol = address - 0x40; // Subtract 0x40 to get the column in Row 1
 				}
 			}
 			else
@@ -131,15 +128,13 @@ int main ()
 						LCD_SendChar(c);
 				}
 				else
-				{
 					SEDBuffer[SEDRow][SEDCol] = c;
 
-					// Move the cursor within the buffer for the next character
-					if (++SEDCol >= 20)
-					{ // Wrap to the next line if at the end of the row
-						SEDCol = 0;
-						SEDRow = (SEDRow + 1) % 2; // Toggle between Row 0 and Row 1
-					}
+				// Move the cursor within the buffer for the next character
+				if (++SEDCol >= 20)
+				{ // Wrap to the next line if at the end of the row
+					SEDCol = 0;
+					SEDRow = (SEDRow + 1) % 2; // Toggle between Row 0 and Row 1
 				}
 			}
 

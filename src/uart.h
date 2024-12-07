@@ -20,6 +20,7 @@
 
 void UART_Init(void);
 void UART_SendChar(char c);
+char UART_ReceiveChar(void);
 void UART_NextRow (void);
 void UART_SendStr(const char* format, ...);
 void UART_SendHex(uint8_t value);
