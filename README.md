@@ -50,3 +50,8 @@ The original release this project is derived from Tim Tashpulatov without licens
 Source code and software license - [GPL v3](https://github.com/skadarnold/sed1200emu/blob/master/LICENSE)
 
 Hardware design license - [CERN OHL-S](https://ohwr.org/project/cernohl/-/wikis/uploads/819d71bea3458f71fba6cf4fb0f2de6b/cern_ohl_s_v2.txt)
+
+## Support the Developer
+This project is brought to you free and open source, but it is not free to develop. If you like this project please consider supporting this and future developments. 
+
+https://www.patreon.com/RetroLoom
